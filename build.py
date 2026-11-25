@@ -98,12 +98,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 <header class="top"><div class="wrap">
 <a class="logo" href="/">Retirement Plan <span>Karo</span></a>
-<a class="cta-btn" href="{MAIN_SITE}">Free Retirement Plan &rarr;</a>
+<a class="cta-btn" href="{MAIN_SITE}/retirement-planner/?utm_source=blog&amp;utm_medium=header&amp;utm_campaign=blog-header">Free Retirement Plan &rarr;</a>
 </div></header>
 <main><div class="wrap">
 {body}
 </div></main>
-<footer>&copy; {datetime.now().year} <a href="{MAIN_SITE}">retirementplankaro.com</a> &middot; <a href="/">Blog</a> &middot; <a href="/rss.xml">RSS</a></footer>
+<footer>&copy; {datetime.now().year} <a href="{MAIN_SITE}/?utm_source=blog&amp;utm_medium=footer&amp;utm_campaign=blog-footer">retirementplankaro.com</a> &middot; <a href="/">Blog</a> &middot; <a href="/rss.xml">RSS</a></footer>
 </body>
 </html>
 """
