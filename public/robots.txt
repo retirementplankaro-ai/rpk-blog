@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://blog.retirementplankaro.com/sitemap.xml
