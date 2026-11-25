@@ -115,6 +115,9 @@ def build():
         url = f"{SITE_URL}/{p['slug']}/"
         tool = ""
         if p.get("tool_url"):
+            if "utm_source=" not in p["tool_url"]:
+                sep = "&" if "?" in p["tool_url"] else "?"
+                p["tool_url"] += f"{sep}utm_source=blog&utm_medium=article&utm_campaign={p['slug']}"
             tool = (f'<div class="tool-box"><strong>{html.escape(p.get("tool_name", "Free Calculator"))}</strong>'
                     f'<div>Apna exact number 30 second mein nikaalein, bilkul free.</div>'
                     f'<a href="{html.escape(p["tool_url"])}">Try it free &rarr;</a></div>')
