@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       date:
-        description: "Date folder to post (YYYY-MM-DD). Empty = today (India time)"
+        description: "Folder to post, e.g. 2026-11-27 or 2026-11-27-night. Empty = all new ones"
         required: false
         default: ""
 

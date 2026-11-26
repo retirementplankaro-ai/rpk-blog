@@ -14,7 +14,6 @@ Reads public/social/<date>/post.json (written by the daily content task):
 Writes social-log/<date>.json with what was posted, so nothing is posted twice.
 Needs secret META_PAGE_TOKEN (a non-expiring Page access token).
 """
-import datetime
 import json
 import os
 import pathlib
@@ -139,15 +138,24 @@ def post_facebook_video(video, description, title):
 
 
 def main():
-    date = (sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] else
-            datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=5, minutes=30))).date().isoformat())
-    spec_file = ROOT / "public" / "social" / date / "post.json"
-    if not spec_file.exists():
-        log(f"No {spec_file.relative_to(ROOT)}; nothing to post.")
-        return
+    """Post every public/social/<folder>/post.json (e.g. 2026-11-27 and 2026-11-27-night).
+    Already-posted platforms are skipped using social-log/<folder>.json."""
     if not TOKEN:
         log("META_PAGE_TOKEN secret is not set yet; skipping (the daily task will use its fallback).")
         return
+    wanted = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] else None
+    folders = sorted(p.parent.name for p in (ROOT / "public" / "social").glob("*/post.json"))
+    if wanted:
+        folders = [f for f in folders if f == wanted]
+    if not folders:
+        log("No post.json found; nothing to post.")
+    for folder in folders:
+        log(f"== {folder} ==")
+        post_folder(folder)
+
+
+def post_folder(date):
+    spec_file = ROOT / "public" / "social" / date / "post.json"
     spec = json.loads(spec_file.read_text(encoding="utf-8"))
     log_file = ROOT / "social-log" / f"{date}.json"
     done = json.loads(log_file.read_text()) if log_file.exists() else {}
