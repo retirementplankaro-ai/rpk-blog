@@ -12,6 +12,7 @@ from datetime import datetime
 from pathlib import Path
 
 import markdown
+from cover import make_cover
 
 ROOT = Path(__file__).parent
 POSTS_DIR = ROOT / "content" / "posts"
@@ -140,7 +141,14 @@ def build():
             "author": {"@type": "Organization", "name": "Retirement Plan Karo", "url": MAIN_SITE},
             "publisher": {"@type": "Organization", "name": "Retirement Plan Karo", "url": MAIN_SITE},
         }
-        head = f'<script type="application/ld+json">{json.dumps(schema, ensure_ascii=False)}</script>'
+        make_cover(p["title"], p.get("tool_name", ""), OUT / p["slug"] / "cover.jpg")
+        cover_url = f"{SITE_URL}/{p['slug']}/cover.jpg"
+        schema["image"] = cover_url
+        head = (f'<meta property="og:type" content="article"><meta property="og:title" content="{html.escape(p["title"])}">'
+                f'<meta property="og:description" content="{html.escape(p["description"])}">'
+                f'<meta property="og:url" content="{url}"><meta property="og:image" content="{cover_url}">'
+                f'<meta name="twitter:card" content="summary_large_image">\n'
+                f'<script type="application/ld+json">{json.dumps(schema, ensure_ascii=False)}</script>')
         faq = re.findall(r"^### (.+\?)\s*\n+(.+?)(?=\n### |\n## |\Z)", p["body_md"], re.M | re.S)
         if faq:
             faq_schema = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
@@ -152,7 +160,7 @@ def build():
                 f'<div class="meta">{p["dt"].strftime("%d %B %Y")} &middot; Retirement Plan Karo</div>'
                 f'{body_html}{tool}<p class="disclaimer">{DISCLAIMER}</p></article>')
         d = OUT / p["slug"]
-        d.mkdir(parents=True)
+        d.mkdir(parents=True, exist_ok=True)
         (d / "index.html").write_text(page(p["title"], p["description"], url, body, head), encoding="utf-8")
 
     items = "".join(
@@ -179,10 +187,10 @@ def build():
         f'<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0"><channel><title>{SITE_NAME}</title>'
         f"<link>{SITE_URL}/</link><description>Retirement and money guides for India</description>{rss_items}</channel></rss>\n",
         encoding="utf-8")
-    # LinkedIn feed: one post per day (night edition skipped), links carry LinkedIn UTM tags.
-    # Read by the free Zapier "RSS -> LinkedIn company update" automation.
+    # LinkedIn feed: every article with its cover image (enclosure), links carry LinkedIn UTM tags.
+    # Read by the free Zapier "RSS -> LinkedIn company update" automation (posts as an image post).
     li_items = []
-    for p in [q for q in posts if q.get("edition", "").lower() != "night"][:15]:
+    for p in posts[:15]:
         utm = f"utm_source=linkedin&utm_medium=social&utm_campaign={p['slug']}"
         link = f"{SITE_URL}/{p['slug']}/?{utm}"
         tool = re.sub(r"utm_source=blog&utm_medium=article", "utm_source=linkedin&utm_medium=social", p.get("tool_url", ""))
@@ -194,10 +202,11 @@ def build():
             f"<item><title>{html.escape(p['title'])}</title><link>{html.escape(link)}</link>"
             f"<guid isPermaLink=\"false\">{SITE_URL}/{p['slug']}/</guid>"
             f"<pubDate>{p['dt'].strftime('%a, %d %b %Y 06:00:00 +0530')}</pubDate>"
-            f"<description>{html.escape(text)}</description></item>")
+            f"<description>{html.escape(text)}</description>"
+            f'<enclosure url="{SITE_URL}/{p["slug"]}/cover.jpg" type="image/jpeg" length="0"/></item>')
     (OUT / "linkedin.xml").write_text(
         f'<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0"><channel><title>{SITE_NAME} LinkedIn</title>'
-        f"<link>{SITE_URL}/</link><description>One post per day for LinkedIn</description>{''.join(li_items)}</channel></rss>\n",
+        f"<link>{SITE_URL}/</link><description>New articles for LinkedIn</description>{''.join(li_items)}</channel></rss>\n",
         encoding="utf-8")
     (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n", encoding="utf-8")
     print(f"Built {len(posts)} post(s) into {OUT}")

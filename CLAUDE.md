@@ -14,7 +14,7 @@ Static blog for https://blog.retirementplankaro.com (Cloudflare Pages project, d
    tool_url: https://retirementplankaro.com/sip-calculator/
    ---
    ```
-   For the 11 PM night run, also add `edition: night` (LinkedIn gets only the morning article via public/linkedin.xml).
+   `pip install --break-system-packages markdown pillow`: build.py also makes public/<slug>/cover.jpg (used on LinkedIn and as og:image).
 2. Body in Markdown. Use `## ` sections, one table, a `## FAQ` section where every question is a `### ...?` heading (this becomes FAQ schema).
 3. `pip install --break-system-packages markdown` if needed, then `python3 build.py`.
 4. Commit both `content/` and `public/` and push to `main`.
