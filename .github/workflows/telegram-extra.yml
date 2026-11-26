@@ -1,0 +1,33 @@
+name: Telegram extra posts
+
+on:
+  schedule:
+    - cron: "30 7 * * *"    # 1:00 PM IST - calculator of the day
+    - cron: "30 13 * * *"   # 7:00 PM IST - older article with cover photo
+  workflow_dispatch:
+    inputs:
+      kind:
+        description: "calculator or old_article"
+        required: false
+        default: ""
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Post
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT: ${{ vars.TELEGRAM_CHAT }}
+        run: |
+          KIND="${{ github.event.inputs.kind }}"
+          if [ -z "$KIND" ]; then
+            if [ "${{ github.event.schedule }}" = "30 7 * * *" ]; then KIND=calculator; else KIND=old_article; fi
+          fi
+          python scripts/telegram_extra.py "$KIND"
