@@ -2,8 +2,39 @@
   "date": "2026-11-26-night",
   "slug": "ppf-15-saal-mein-kitna-milega",
   "action_error": "me: API access blocked. (GitHub Action stopped before posting anything)",
-  "instagram": {"ok": true, "id": "18117909418860019", "url": "https://www.instagram.com/p/DgNthp6Fpt6/", "note": "posted via Windsor"},
-  "instagram_reel": {"ok": true, "id": "17921358534544749", "url": "https://www.instagram.com/reel/DgNtlNqK3i2/", "note": "posted via Windsor"},
-  "facebook": {"ok": true, "id": "1521147887744395_122101579647560053", "url": "https://www.facebook.com/1521147887744395/posts/122101579647560053", "note": "posted via Windsor"},
-  "youtube": {"ok": false, "error": "YouTube rate-limited the upload (3 tries via Windsor)"}
+  "instagram": {
+    "ok": true,
+    "id": "18117909418860019",
+    "url": "https://www.instagram.com/p/DgNthp6Fpt6/",
+    "note": "posted via Windsor"
+  },
+  "instagram_reel": {
+    "ok": true,
+    "id": "17921358534544749",
+    "url": "https://www.instagram.com/reel/DgNtlNqK3i2/",
+    "note": "posted via Windsor"
+  },
+  "facebook": {
+    "ok": true,
+    "id": "1521147887744395_122101579647560053",
+    "url": "https://www.facebook.com/1521147887744395/posts/122101579647560053",
+    "note": "posted via Windsor"
+  },
+  "youtube": {
+    "ok": false,
+    "error": "YouTube rate-limited the upload (3 tries via Windsor)"
+  },
+  "facebook_video": {
+    "ok": false,
+    "error": "Facebook token: me: API access blocked."
+  },
+  "telegram": {
+    "ok": true,
+    "id": "10",
+    "url": "https://t.me/RetirementPlankaro_001/10"
+  },
+  "threads": {
+    "ok": false,
+    "error": "Threads me: API access blocked."
+  }
 }
