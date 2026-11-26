@@ -7,7 +7,8 @@
     "url": "https://www.instagram.com/reel/DgMiJXIpYJB/"
   },
   "facebook_video": {
-    "ok": false,
-    "error": "1521147887744395/video_reels: (#200) Subject does not have permission to post videos on this target"
+    "ok": true,
+    "id": "1140468215442885",
+    "url": "https://www.facebook.com/reel/1140468215442885"
   }
 }
