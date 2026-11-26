@@ -137,6 +137,113 @@ def post_facebook_video(video, description, title):
     return {"id": vid, "url": f"https://www.facebook.com/reel/{vid}"}
 
 
+# ---------- Telegram channel (free Bot API) ----------
+TG_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+TG_CHAT = os.environ.get("TELEGRAM_CHAT", "").strip()
+
+
+def social_text(spec, source, limit):
+    """Reuse the Facebook text with this platform's UTM source, trimmed to the platform limit."""
+    text = spec.get(f"{source}_text") or spec.get("fb_message", "")
+    text = text.replace("utm_source=facebook", f"utm_source={source}")
+    if len(text) > limit:
+        text = text[: limit - 1].rsplit("\n", 1)[0].rstrip() + "\u2026"
+    return text
+
+
+def post_telegram(spec, images):
+    photo = f"https://blog.retirementplankaro.com/{spec['slug']}/cover.jpg"
+    r = requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto", timeout=60, data={
+        "chat_id": TG_CHAT, "photo": photo, "caption": social_text(spec, "telegram", 1024)})
+    body = r.json()
+    if not body.get("ok"):
+        # cover may not exist for old posts; fall back to the first slide
+        r = requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto", timeout=60, data={
+            "chat_id": TG_CHAT, "photo": images[0], "caption": social_text(spec, "telegram", 1024)})
+        body = r.json()
+        if not body.get("ok"):
+            raise RuntimeError(f"Telegram: {body.get('description', body)}")
+    msg = body["result"]
+    chat = msg["chat"].get("username")
+    url = f"https://t.me/{chat}/{msg['message_id']}" if chat else "Telegram channel"
+    return {"id": str(msg["message_id"]), "url": url}
+
+
+# ---------- Threads (free Threads API) ----------
+THREADS = "https://graph.threads.net/v1.0"
+THREADS_SECRET = os.environ.get("THREADS_TOKEN", "").strip()
+THREADS_STORE = ROOT / "social-log" / "threads_token.enc"
+_threads_token = None
+
+
+def _fernet():
+    import base64, hashlib
+    from cryptography.fernet import Fernet
+    return Fernet(base64.urlsafe_b64encode(hashlib.sha256(("rpk:" + THREADS_SECRET).encode()).digest()))
+
+
+def threads_token():
+    """Long-lived Threads tokens last 60 days; refresh on every run and keep the newest one encrypted in the repo."""
+    global _threads_token
+    if _threads_token:
+        return _threads_token
+    tok = THREADS_SECRET
+    if THREADS_STORE.exists():
+        try:
+            tok = _fernet().decrypt(THREADS_STORE.read_bytes()).decode()
+        except Exception:
+            tok = THREADS_SECRET
+    try:
+        r = requests.get("https://graph.threads.net/refresh_access_token",
+                         params={"grant_type": "th_refresh_token", "access_token": tok}, timeout=60).json()
+        if r.get("access_token"):
+            tok = r["access_token"]
+            THREADS_STORE.parent.mkdir(exist_ok=True)
+            THREADS_STORE.write_bytes(_fernet().encrypt(tok.encode()))
+    except Exception as e:
+        log("threads token refresh skipped:", e)
+    _threads_token = tok
+    return tok
+
+
+def threads_api(method, path, **params):
+    params["access_token"] = threads_token()
+    r = requests.request(method, f"{THREADS}/{path}", timeout=120,
+                         data=params if method == "POST" else None, params=params if method == "GET" else None)
+    body = r.json()
+    if not r.ok or "error" in body:
+        err = body.get("error", body)
+        raise RuntimeError(f"Threads {path}: {err.get('message', err) if isinstance(err, dict) else err}")
+    return body
+
+
+def threads_wait(cid):
+    for _ in range(40):
+        st = threads_api("GET", cid, fields="status,error_message")
+        if st.get("status") == "FINISHED":
+            return
+        if st.get("status") in ("ERROR", "EXPIRED"):
+            raise RuntimeError(f"Threads media {st.get('status')}: {st.get('error_message', '')}")
+        time.sleep(10)
+    raise RuntimeError("Threads media processing timed out")
+
+
+def post_threads(spec, images):
+    uid = threads_api("GET", "me", fields="id,username")
+    text = social_text(spec, "threads", 500)
+    kids = []
+    for url in images[:20]:
+        kids.append(threads_api("POST", f"{uid['id']}/threads", media_type="IMAGE",
+                                image_url=url, is_carousel_item="true")["id"])
+    for k in kids:
+        threads_wait(k)
+    car = threads_api("POST", f"{uid['id']}/threads", media_type="CAROUSEL", children=",".join(kids), text=text)
+    threads_wait(car["id"])
+    pub = threads_api("POST", f"{uid['id']}/threads_publish", creation_id=car["id"])
+    link = threads_api("GET", pub["id"], fields="permalink").get("permalink")
+    return {"id": pub["id"], "url": link or f"https://www.threads.com/@{uid.get('username', '')}"}
+
+
 def resolve_page_token():
     """Accept either a Page token or a User token in META_PAGE_TOKEN; always post with the Page token."""
     global TOKEN
@@ -194,6 +301,11 @@ def post_folder(date):
         if os.environ.get("FB_VIDEO") == "1":  # needs publish_video permission; off for now
           tasks.append(("facebook_video", lambda: post_facebook_video(
             video, spec.get("fb_video_description", spec["reel_caption"]), spec.get("video_title", spec.get("slug", "")))))
+
+    if TG_TOKEN and TG_CHAT and images:
+        tasks.append(("telegram", lambda: post_telegram(spec, images)))
+    if THREADS_SECRET and len(images) >= 2:
+        tasks.append(("threads", lambda: post_threads(spec, images)))
 
     for name, fn in tasks:
         if done.get(name, {}).get("ok"):
