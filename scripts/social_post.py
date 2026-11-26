@@ -137,12 +137,27 @@ def post_facebook_video(video, description, title):
     return {"id": vid, "url": f"https://www.facebook.com/reel/{vid}"}
 
 
+def resolve_page_token():
+    """Accept either a Page token or a User token in META_PAGE_TOKEN; always post with the Page token."""
+    global TOKEN
+    me = api("GET", "me", fields="id,name")
+    if me.get("id") == PAGE_ID:
+        log("Token type: Page")
+        return
+    page = api("GET", PAGE_ID, fields="access_token,name")
+    if not page.get("access_token"):
+        raise SystemExit("Token cannot manage the Facebook Page")
+    TOKEN = page["access_token"]
+    log("Token type: User -> using Page token for", page.get("name"))
+
+
 def main():
     """Post every public/social/<folder>/post.json (e.g. 2026-11-27 and 2026-11-27-night).
     Already-posted platforms are skipped using social-log/<folder>.json."""
     if not TOKEN:
         log("META_PAGE_TOKEN secret is not set yet; skipping (the daily task will use its fallback).")
         return
+    resolve_page_token()
     wanted = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] else None
     folders = sorted(p.parent.name for p in (ROOT / "public" / "social").glob("*/post.json"))
     if wanted:
