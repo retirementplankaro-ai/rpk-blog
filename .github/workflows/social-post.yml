@@ -32,6 +32,7 @@ jobs:
         env:
           META_PAGE_TOKEN: ${{ secrets.META_PAGE_TOKEN }}
           FB_PAGE_ID: "1521147887744395"
+          FB_VIDEO: "1"
           IG_USER_ID: ${{ vars.IG_USER_ID }}
         run: python scripts/social_post.py "${{ github.event.inputs.date }}"
       - name: Save result log
