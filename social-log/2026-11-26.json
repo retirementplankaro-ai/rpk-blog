@@ -8,6 +8,6 @@
   },
   "facebook_video": {
     "ok": false,
-    "error": "1521147887744395/videos: (#100) No permission to publish the video"
+    "error": "1521147887744395/video_reels: (#200) Subject does not have permission to post videos on this target"
   }
 }
