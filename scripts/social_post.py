@@ -126,8 +126,16 @@ def post_facebook_photos(images, message):
 
 
 def post_facebook_video(video, description, title):
-    v = api("POST", f"{PAGE_ID}/videos", file_url=video, description=description, title=title[:250])
-    return {"id": v["id"], "url": f"https://www.facebook.com/{PAGE_ID}/videos/{v['id']}"}
+    """Publish the vertical video as a Facebook Page Reel (needs only pages_manage_posts)."""
+    start = api("POST", f"{PAGE_ID}/video_reels", upload_phase="start")
+    vid = start["video_id"]
+    upload_url = start.get("upload_url") or f"https://rupload.facebook.com/video-upload/{GRAPH.rsplit('/', 1)[1]}/{vid}"
+    r = requests.post(upload_url, headers={"Authorization": f"OAuth {TOKEN}", "file_url": video}, timeout=300)
+    if not r.ok:
+        raise RuntimeError(f"Facebook reel upload: {r.text[:200]}")
+    api("POST", f"{PAGE_ID}/video_reels", upload_phase="finish", video_id=vid,
+        video_state="PUBLISHED", description=description, title=title[:250])
+    return {"id": vid, "url": f"https://www.facebook.com/reel/{vid}"}
 
 
 def main():
