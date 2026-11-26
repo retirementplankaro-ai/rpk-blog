@@ -24,7 +24,7 @@ import time
 import requests
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-GRAPH = "https://graph.facebook.com/" + os.environ.get("GRAPH_VERSION", "v24.0")
+GRAPH = "https://graph.facebook.com/" + os.environ.get("GRAPH_VERSION", "v27.0")
 PAGE_ID = os.environ.get("FB_PAGE_ID", "1521147887744395")
 TOKEN = os.environ.get("META_PAGE_TOKEN", "").strip()
 
