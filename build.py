@@ -39,6 +39,7 @@ blockquote{margin:16px 0;padding:12px 16px;background:#fff8e6;border-left:4px so
 .post-list a.t{font-size:20px;font-weight:700;text-decoration:none;color:var(--ink)}.post-list p{margin:6px 0 0;color:var(--muted)}
 .disclaimer{font-size:13px;color:var(--muted);margin-top:28px;border-top:1px solid var(--line);padding-top:12px}
 footer{text-align:center;color:var(--muted);font-size:14px;padding:24px 0 40px}
+footer .social{margin-top:8px;line-height:1.9}
 @media(max-width:600px){h1{font-size:25px}article{padding:18px}body{font-size:16px}}
 """
 
@@ -104,7 +105,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <main><div class="wrap">
 {body}
 </div></main>
-<footer>&copy; {datetime.now().year} <a href="{MAIN_SITE}/?utm_source=blog&amp;utm_medium=footer&amp;utm_campaign=blog-footer">retirementplankaro.com</a> &middot; <a href="/">Blog</a> &middot; <a href="/rss.xml">RSS</a></footer>
+<footer>&copy; {datetime.now().year} <a href="{MAIN_SITE}/?utm_source=blog&amp;utm_medium=footer&amp;utm_campaign=blog-footer">retirementplankaro.com</a> &middot; <a href="/">Blog</a> &middot; <a href="/rss.xml">RSS</a><div class="social">Follow: <a href="https://www.instagram.com/retirementplankaro/" target="_blank" rel="noopener">Instagram</a> &middot; <a href="https://www.facebook.com/profile.php?id=61596801606729" target="_blank" rel="noopener">Facebook</a> &middot; <a href="https://www.youtube.com/@RetirementPlanKaro" target="_blank" rel="noopener">YouTube</a> &middot; <a href="https://www.linkedin.com/company/retirementplankaro" target="_blank" rel="noopener">LinkedIn</a> &middot; <a href="https://t.me/RetirementPlankaro_001" target="_blank" rel="noopener">Telegram</a> &middot; <a href="https://www.threads.com/@retirementplankaro" target="_blank" rel="noopener">Threads</a> &middot; <a href="https://chat.whatsapp.com/LlG1Zjwe8ih4BAq2xktQZ3" target="_blank" rel="noopener">WhatsApp</a></div></footer>
 </body>
 </html>
 """
