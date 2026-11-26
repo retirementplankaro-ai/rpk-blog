@@ -26,6 +26,8 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 GRAPH = "https://graph.facebook.com/" + os.environ.get("GRAPH_VERSION", "v27.0")
 PAGE_ID = os.environ.get("FB_PAGE_ID", "1521147887744395")
 TOKEN = os.environ.get("META_PAGE_TOKEN", "").strip()
+META_ERROR = None  # set when the Meta token check fails; Telegram/Threads still post
+META_TASKS = {"instagram", "facebook", "instagram_reel", "facebook_video"}
 
 
 def log(*a):
@@ -261,10 +263,18 @@ def resolve_page_token():
 def main():
     """Post every public/social/<folder>/post.json (e.g. 2026-11-27 and 2026-11-27-night).
     Already-posted platforms are skipped using social-log/<folder>.json."""
+    # A Meta (Facebook/Instagram) problem must not stop Telegram and Threads:
+    # remember the error, mark only the Meta platforms as failed, and carry on.
+    global META_ERROR
     if not TOKEN:
-        log("META_PAGE_TOKEN secret is not set yet; skipping (the daily task will use its fallback).")
-        return
-    resolve_page_token()
+        META_ERROR = "META_PAGE_TOKEN secret is not set"
+        log(META_ERROR + "; Instagram/Facebook skipped, other platforms continue.")
+    else:
+        try:
+            resolve_page_token()
+        except (Exception, SystemExit) as e:
+            META_ERROR = f"Facebook token: {e}"[:300]
+            log(f"{META_ERROR}; Instagram/Facebook skipped, other platforms continue.")
     wanted = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] else None
     folders = sorted(p.parent.name for p in (ROOT / "public" / "social").glob("*/post.json"))
     if wanted:
@@ -310,6 +320,10 @@ def post_folder(date):
     for name, fn in tasks:
         if done.get(name, {}).get("ok"):
             log(f"{name}: already posted, skipping")
+            continue
+        if META_ERROR and name in META_TASKS:
+            done[name] = {"ok": False, "error": META_ERROR}
+            log(f"{name}: SKIPPED ({META_ERROR})")
             continue
         try:
             if ig is None and name.startswith("instagram"):
