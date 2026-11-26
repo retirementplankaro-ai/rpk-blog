@@ -168,7 +168,8 @@ def main():
         tasks.append(("facebook", lambda: post_facebook_photos(images, spec["fb_message"])))
     if video and spec.get("reel_caption"):
         tasks.append(("instagram_reel", lambda: post_instagram_reel(ig, video, spec["reel_caption"])))
-        tasks.append(("facebook_video", lambda: post_facebook_video(
+        if os.environ.get("FB_VIDEO") == "1":  # needs publish_video permission; off for now
+          tasks.append(("facebook_video", lambda: post_facebook_video(
             video, spec.get("fb_video_description", spec["reel_caption"]), spec.get("video_title", spec.get("slug", "")))))
 
     for name, fn in tasks:
