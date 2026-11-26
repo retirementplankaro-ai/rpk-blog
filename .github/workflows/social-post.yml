@@ -1,0 +1,45 @@
+name: Post to Instagram and Facebook
+
+on:
+  push:
+    branches: [main]
+    paths: ["public/social/**/post.json"]
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Date folder to post (YYYY-MM-DD). Empty = today (India time)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: social-post
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Post
+        env:
+          META_PAGE_TOKEN: ${{ secrets.META_PAGE_TOKEN }}
+          FB_PAGE_ID: "1521147887744395"
+          IG_USER_ID: ${{ vars.IG_USER_ID }}
+        run: python scripts/social_post.py "${{ github.event.inputs.date }}"
+      - name: Save result log
+        run: |
+          if [ -n "$(git status --porcelain social-log)" ]; then
+            git config user.name "Retirement Plan Karo"
+            git config user.email "retirementplankaro@gmail.com"
+            git add social-log
+            git commit -m "Social post log [skip ci]"
+            for i in 1 2 3; do git pull --rebase origin main && git push origin main && break; sleep 10; done
+          fi
