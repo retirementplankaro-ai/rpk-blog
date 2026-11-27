@@ -153,15 +153,33 @@ def social_text(spec, source, limit):
     return text
 
 
+def _fetch_image(urls, tries=20):
+    """Download the first URL that returns a real image; wait for Cloudflare deploy."""
+    import time
+    for _ in range(tries):
+        for u in urls:
+            try:
+                g = requests.get(u, timeout=30)
+                if g.ok and g.headers.get("content-type", "").startswith("image/"):
+                    return g.content
+            except requests.RequestException:
+                pass
+        time.sleep(15)
+    return None
+
+
 def post_telegram(spec, images):
-    photo = f"https://blog.retirementplankaro.com/{spec['slug']}/cover.jpg"
-    r = requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto", timeout=60, data={
-        "chat_id": TG_CHAT, "photo": photo, "caption": social_text(spec, "telegram", 1024)})
-    body = r.json()
-    if not body.get("ok"):
-        # cover may not exist for old posts; fall back to the first slide
-        r = requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto", timeout=60, data={
-            "chat_id": TG_CHAT, "photo": images[0], "caption": social_text(spec, "telegram", 1024)})
+    cover = f"https://blog.retirementplankaro.com/{spec['slug']}/cover.jpg"
+    data = _fetch_image([cover] + list(images[:1]))
+    cap = social_text(spec, "telegram", 1024)
+    if data:
+        r = requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto", timeout=60,
+                          data={"chat_id": TG_CHAT, "caption": cap},
+                          files={"photo": ("cover.jpg", data, "image/jpeg")})
+    else:
+        r = requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", timeout=60,
+                          data={"chat_id": TG_CHAT, "text": cap})
+    if True:
         body = r.json()
         if not body.get("ok"):
             raise RuntimeError(f"Telegram: {body.get('description', body)}")
