@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-27",
+  "slug": "vpf-mein-extra-paisa-kitna-fayda",
+  "instagram": {
+    "ok": false,
+    "error": "Facebook token: me: API access blocked."
+  },
+  "facebook": {
+    "ok": false,
+    "error": "Facebook token: me: API access blocked."
+  },
+  "instagram_reel": {
+    "ok": false,
+    "error": "Facebook token: me: API access blocked."
+  },
+  "facebook_video": {
+    "ok": false,
+    "error": "Facebook token: me: API access blocked."
+  },
+  "telegram": {
+    "ok": false,
+    "error": "Telegram: Bad Request: wrong type of the web page content"
+  },
+  "threads": {
+    "ok": false,
+    "error": "Threads me: API access blocked."
+  }
+}
