@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-27-night",
+  "slug": "inflation-se-retirement-kharcha-kitna-badhega",
+  "instagram": {
+    "ok": false,
+    "error": "Facebook token: me: API access blocked."
+  },
+  "facebook": {
+    "ok": false,
+    "error": "Facebook token: me: API access blocked."
+  },
+  "instagram_reel": {
+    "ok": false,
+    "error": "Facebook token: me: API access blocked."
+  },
+  "facebook_video": {
+    "ok": false,
+    "error": "Facebook token: me: API access blocked."
+  },
+  "telegram": {
+    "ok": true,
+    "id": "13",
+    "url": "https://t.me/RetirementPlankaro_001/13"
+  },
+  "threads": {
+    "ok": false,
+    "error": "Threads me: API access blocked."
+  }
+}
