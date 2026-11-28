@@ -11,12 +11,14 @@
     "note": "posted via Windsor (morning task)"
   },
   "instagram_reel": {
-    "ok": false,
-    "error": "Facebook token: me: API access blocked."
+    "ok": true,
+    "id": "17929465524437946",
+    "url": "https://www.instagram.com/reel/DgR4HgRMHJD/"
   },
   "facebook_video": {
-    "ok": false,
-    "error": "Facebook token: me: API access blocked."
+    "ok": true,
+    "id": "2123636288273942",
+    "url": "https://www.facebook.com/reel/2123636288273942"
   },
   "telegram": {
     "ok": true,
