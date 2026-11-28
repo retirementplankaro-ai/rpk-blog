@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-28",
+  "slug": "nps-se-kitni-pension-milegi",
+  "instagram": {
+    "ok": false,
+    "error": "Facebook token: me: API access blocked."
+  },
+  "facebook": {
+    "ok": false,
+    "error": "Facebook token: me: API access blocked."
+  },
+  "instagram_reel": {
+    "ok": false,
+    "error": "Facebook token: me: API access blocked."
+  },
+  "facebook_video": {
+    "ok": false,
+    "error": "Facebook token: me: API access blocked."
+  },
+  "telegram": {
+    "ok": true,
+    "id": "14",
+    "url": "https://t.me/RetirementPlankaro_001/14"
+  },
+  "threads": {
+    "ok": false,
+    "error": "Threads me: API access blocked."
+  }
+}
