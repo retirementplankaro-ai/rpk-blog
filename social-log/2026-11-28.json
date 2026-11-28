@@ -2,12 +2,13 @@
   "date": "2026-11-28",
   "slug": "nps-se-kitni-pension-milegi",
   "instagram": {
-    "ok": false,
-    "error": "Facebook token: me: API access blocked."
+    "ok": true,
+    "url": "https://www.instagram.com/p/DgRE4MZglha/",
+    "note": "posted via Windsor"
   },
   "facebook": {
-    "ok": false,
-    "error": "Facebook token: me: API access blocked."
+    "ok": true,
+    "note": "posted via Windsor (morning task)"
   },
   "instagram_reel": {
     "ok": false,
